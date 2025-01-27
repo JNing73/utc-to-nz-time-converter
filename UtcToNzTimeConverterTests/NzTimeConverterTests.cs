@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Security.Cryptography;
+using Xunit;
 
 namespace UtcToNzTimeConverter
 {
@@ -47,6 +48,21 @@ namespace UtcToNzTimeConverter
                 $"for formatting errors or invalid dates and/or times"
                 , exception.Message
                 );
+        }
+
+        [Fact]
+        public void Covert_ZuluTimeOffset_ReturnsConvertedValue()
+        {
+            Assert.Equal("2008-07-15T19:00:00:000", NzTimeConverter.Convert("2000-07-15T07:00:00.000Z")); // Non DST day (UTC + 12)
+            Assert.Equal("2008-07-15T15:56:23.632", NzTimeConverter.Convert("2008-07-15T03:56:23.632Z")); // Non DST day (UTC +12)
+            Assert.Equal("2012-08-28T22:56:23.632", NzTimeConverter.Convert("2012-08-28T10:56:23.632Z")); // Non DST day (UTC + 12)
+            Assert.Equal("2012-08-29T00:56:23:632", NzTimeConverter.Convert("2012-08-28T12:56:23.632Z")); // Non DST day - Rollover to next day
+            Assert.Equal("2015-06-23T02:10:33.142", NzTimeConverter.Convert("2015-06-22T14:10:33.142Z")); // Non DST day - Rollover to next day
+            Assert.Equal("2024-04-06T13:00:00.000", NzTimeConverter.Convert("2024-04-06T00:00:00.000Z")); // Last day of DST 2024 (UTC + 13)
+            Assert.Equal("2024-04-07T12:00:00.000", NzTimeConverter.Convert("2024-04-07T00:00:00.000Z")); // End of DST 2024 (UTC + 12)
+            Assert.Equal("2024-09-29T13:23:08.111", NzTimeConverter.Convert("2024-09-29T00:23:08.111Z")); // First day of DST 2024 (UTC + 13)
+            Assert.Equal("2024-04-05T13:00:00.000", NzTimeConverter.Convert("2024-04-05T00:00:00.000Z")); // Last day of DST 2024 (UTC + 13)
+            Assert.Equal("2024-04-06T12:00:00.000", NzTimeConverter.Convert("2024-04-06T00:00:00.000Z")); // Last day of DST 2024 (UTC + 13)
         }
     }
 }
