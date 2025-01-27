@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace UtcToNzTimeConverter;
 public class NzTimeConverter
@@ -9,13 +10,11 @@ public class NzTimeConverter
     {
         string format = _standardFormat;
 
-        bool mayBeZulu = (
-            timestamp.Length > 0 &&
-            timestamp.Substring(timestamp.Length - 1) == "Z"
-            );
-        if (mayBeZulu)
+        bool mayHaveSpecifier = false;
+        if (timestamp.Length > _standardFormat.Length)
         {
-            format += "Z";
+            mayHaveSpecifier = true;
+            format += "K"; // 'K' denotes both Zulu time and UTC offsets in the format patterb
         }
 
         bool validTimeStamp = DateTime.TryParseExact(
@@ -26,7 +25,7 @@ public class NzTimeConverter
                 out DateTime dt
                 );
 
-        if (validTimeStamp && mayBeZulu)
+        if (validTimeStamp && (mayHaveSpecifier))
         {
             return dt.ToString(_standardFormat);
         }
