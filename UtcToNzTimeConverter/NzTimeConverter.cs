@@ -3,6 +3,6 @@ public class NzTimeConverter
 {
     public static string Convert(string timestamp)
     {
-        throw new NotImplementedException();
+        return timestamp;
     }
 }
