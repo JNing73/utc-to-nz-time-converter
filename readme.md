@@ -30,9 +30,11 @@ A console application which takes a string input and returns a string
 ## Key Concepts Demonstrated
 - Working with DateTimes in C#
 	- Format Validation
-	- Conversions
+	- Timezone Conversions
 - xUnit Testing
 	- Test driven development principles
 	- Data driven tests
+- Continuous Integration
 	- Setting up a Continuous Integration (CI) pipeline which builds and 
 	  runs the tests on commits to main branch.
+	- Setting up rulesets to protect the main branch.
