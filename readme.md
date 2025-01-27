@@ -1,5 +1,7 @@
 # UTC to NZ Local Converter
 
+This is a .Net Console Application.
+
 In summary it is a console application which receives a timestamp as a string
 and converts it to a timestamp which represents the equivalent timestamp in NZ.
 
