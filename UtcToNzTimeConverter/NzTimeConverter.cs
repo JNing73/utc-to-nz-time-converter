@@ -5,6 +5,7 @@ namespace UtcToNzTimeConverter;
 public class NzTimeConverter
 {
     private static readonly string _standardFormat = "yyyy-MM-ddTHH:mm:ss.fff";
+    private static readonly TimeZoneInfo _nztimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
 
     public static string Convert(string timestamp)
     {
@@ -21,12 +22,13 @@ public class NzTimeConverter
                 timestamp,
                 format,
                 CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
+                DateTimeStyles.AdjustToUniversal,
                 out DateTime dt
                 );
 
         if (validTimeStamp && (mayHaveSpecifier))
         {
+             dt = TimeZoneInfo.ConvertTimeFromUtc(dt, _nztimeZone);
             return dt.ToString(_standardFormat);
         }
         if (validTimeStamp)
