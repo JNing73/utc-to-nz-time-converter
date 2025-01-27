@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Security.Cryptography;
+using Xunit;
 
 namespace UtcToNzTimeConverter
 {
@@ -11,9 +12,9 @@ namespace UtcToNzTimeConverter
         [InlineData("1997-11-17T23:45:59.987")]
         [InlineData("2020-02-29T16:37:11.876")] // Leap Year
         [InlineData("2024-02-29T08:15:47.123")] // Leap Year
-        public void Convert_ValidStringNoTimezoneOffset_ReturnsInput(String dateTimeString)
+        public void Convert_ValidStringNoTimezoneOffset_ReturnsInput(String timestamp)
         {
-            Assert.Equal(dateTimeString, NzTimeConverter.Convert(dateTimeString));
+            Assert.Equal(timestamp, NzTimeConverter.Convert(timestamp));
         }
 
         [Theory]
@@ -39,14 +40,29 @@ namespace UtcToNzTimeConverter
         [InlineData("2008-07-15T07:00:00.000+03:5")] // Invalid UTC modifier
         [InlineData("2008-07-15T07:00:00.000A")] // Invalid UTC modifier
         [InlineData("2008-07-15T07:00:00+02:00")] // Valid modifier but missing millisecond value
-        public void Convert_InvalidStringFormat_ThrowsException(String dateTimeString)
+        public void Convert_InvalidStringFormat_ThrowsException(String timestamp)
         {
-            var exception = Assert.Throws<ArgumentException>(() => NzTimeConverter.Convert(dateTimeString));
+            var exception = Assert.Throws<ArgumentException>(() => NzTimeConverter.Convert(timestamp));
             Assert.Equal(
-                $"Please check the input: \"{dateTimeString}\" " +
+                $"Please check the input: \"{timestamp}\" " +
                 $"for formatting errors or invalid dates and/or times"
                 , exception.Message
                 );
+        }
+
+        [Fact]
+        public void Covert_ZuluTimeOffset_ReturnsConvertedValue()
+        {
+            Assert.Equal("2008-07-15T19:00:00.000", NzTimeConverter.Convert("2008-07-15T07:00:00.000Z")); // Non DST day (UTC + 12)
+            Assert.Equal("2008-07-15T15:56:23.632", NzTimeConverter.Convert("2008-07-15T03:56:23.632Z")); // Non DST day (UTC +12)
+            Assert.Equal("2012-08-28T22:56:23.632", NzTimeConverter.Convert("2012-08-28T10:56:23.632Z")); // Non DST day (UTC + 12)
+            Assert.Equal("2012-08-29T00:56:23.632", NzTimeConverter.Convert("2012-08-28T12:56:23.632Z")); // Non DST day - Rollover to next day
+            Assert.Equal("2015-06-23T02:10:33.142", NzTimeConverter.Convert("2015-06-22T14:10:33.142Z")); // Non DST day - Rollover to next day
+            Assert.Equal("2024-04-06T13:00:00.000", NzTimeConverter.Convert("2024-04-06T00:00:00.000Z")); // Last day of DST 2024 (UTC + 13)
+            Assert.Equal("2024-04-07T12:00:00.000", NzTimeConverter.Convert("2024-04-07T00:00:00.000Z")); // End of DST 2024 (UTC + 12)
+            Assert.Equal("2024-09-29T13:23:08.111", NzTimeConverter.Convert("2024-09-29T00:23:08.111Z")); // First day of DST 2024 (UTC + 13)
+            Assert.Equal("2025-04-05T13:00:00.000", NzTimeConverter.Convert("2025-04-05T00:00:00.000Z")); // Last day of DST 2025 (UTC + 13)
+            Assert.Equal("2025-04-06T12:00:00.000", NzTimeConverter.Convert("2025-04-06T00:00:00.000Z")); // End of DST 2025 (UTC + 12)
         }
     }
 }
