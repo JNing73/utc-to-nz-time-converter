@@ -10,20 +10,11 @@ public class NzTimeConverter
     {
         string format = _standardFormat;
 
-        bool mayBeZulu = (
-            timestamp.Length > 0 &&
-            timestamp.Substring(timestamp.Length - 1) == "Z"
-            );
-
-        bool mayBeOffset = IsUtcOffset(timestamp);
-
-        if (mayBeZulu)
+        bool mayHaveSpecifier = false;
+        if (timestamp.Length > _standardFormat.Length)
         {
-            format += "Z";
-        }
-        else if (mayBeOffset)
-        {
-            format += "K";
+            mayHaveSpecifier = true;
+            format += "K"; // 'K' denotes both Zulu time and UTC offsets in the format patterb
         }
 
         bool validTimeStamp = DateTime.TryParseExact(
@@ -34,7 +25,7 @@ public class NzTimeConverter
                 out DateTime dt
                 );
 
-        if (validTimeStamp && (mayBeZulu || mayBeOffset))
+        if (validTimeStamp && (mayHaveSpecifier))
         {
             return dt.ToString(_standardFormat);
         }
@@ -49,11 +40,5 @@ public class NzTimeConverter
                 $"for formatting errors or invalid dates and/or times"
                 );
         }
-    }
-
-    public static bool IsUtcOffset(string timestamp)
-    {
-        string pattern = @"[+-]\d{2}:\d{2}$";
-        return Regex.IsMatch(timestamp, pattern);
     }
 }
