@@ -9,7 +9,10 @@ public class NzTimeConverter
     {
         string format = _standardFormat;
 
-        bool mayBeZulu = timestamp.Substring(timestamp.Length - 1) == "Z";
+        bool mayBeZulu = (
+            timestamp.Length > 0 &&
+            timestamp.Substring(timestamp.Length - 1) == "Z"
+            );
         if (mayBeZulu)
         {
             format += "Z";
