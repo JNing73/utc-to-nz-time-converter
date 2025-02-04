@@ -28,7 +28,7 @@ public class NzTimeConverter
 
         if (validTimeStamp && (mayHaveSpecifier))
         {
-             dt = TimeZoneInfo.ConvertTimeFromUtc(dt, _nztimeZone);
+            dt = TimeZoneInfo.ConvertTimeFromUtc(dt, _nztimeZone);
             return dt.ToString(_standardFormat);
         }
         if (validTimeStamp)
