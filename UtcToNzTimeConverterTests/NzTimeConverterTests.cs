@@ -50,33 +50,35 @@ namespace UtcToNzTimeConverter
                 );
         }
 
-        [Fact]
-        public void Covert_ZuluTimeOffset_ReturnsConvertedValue()
+        [Theory]
+        [InlineData("2008-07-15T19:00:00.000", "2008-07-15T07:00:00.000Z")] // Non DST day (UTC + 12)
+        [InlineData("2008-07-15T15:56:23.632", "2008-07-15T03:56:23.632Z")] // Non DST day (UTC + 12)
+        [InlineData("2012-08-28T22:56:23.632", "2012-08-28T10:56:23.632Z")] // Non DST day (UTC + 12)
+        [InlineData("2012-08-29T00:56:23.632", "2012-08-28T12:56:23.632Z")] // Non DST day - Rollover to next day
+        [InlineData("2015-06-23T02:10:33.142", "2015-06-22T14:10:33.142Z")] // Non DST day - Rollover to next day
+        [InlineData("2024-04-06T13:00:00.000", "2024-04-06T00:00:00.000Z")] // Last day of DST 2024 (UTC + 13)
+        [InlineData("2024-04-07T12:00:00.000", "2024-04-07T00:00:00.000Z")] // End of DST 2024 (UTC + 12)
+        [InlineData("2024-09-29T13:23:08.111", "2024-09-29T00:23:08.111Z")] // First day of DST 2024 (UTC + 13)
+        [InlineData("2025-04-05T13:00:00.000", "2025-04-05T00:00:00.000Z")] // Last day of DST 2025 (UTC + 13)
+        [InlineData("2025-04-06T12:00:00.000", "2025-04-06T00:00:00.000Z")] // End of DST 2025 (UTC + 12)
+        public void Covert_ZuluTimeOffset_ReturnsConvertedValue(string expected, string input)
         {
-            Assert.Equal("2008-07-15T19:00:00.000", NzTimeConverter.Convert("2008-07-15T07:00:00.000Z")); // Non DST day (UTC + 12)
-            Assert.Equal("2008-07-15T15:56:23.632", NzTimeConverter.Convert("2008-07-15T03:56:23.632Z")); // Non DST day (UTC +12)
-            Assert.Equal("2012-08-28T22:56:23.632", NzTimeConverter.Convert("2012-08-28T10:56:23.632Z")); // Non DST day (UTC + 12)
-            Assert.Equal("2012-08-29T00:56:23.632", NzTimeConverter.Convert("2012-08-28T12:56:23.632Z")); // Non DST day - Rollover to next day
-            Assert.Equal("2015-06-23T02:10:33.142", NzTimeConverter.Convert("2015-06-22T14:10:33.142Z")); // Non DST day - Rollover to next day
-            Assert.Equal("2024-04-06T13:00:00.000", NzTimeConverter.Convert("2024-04-06T00:00:00.000Z")); // Last day of DST 2024 (UTC + 13)
-            Assert.Equal("2024-04-07T12:00:00.000", NzTimeConverter.Convert("2024-04-07T00:00:00.000Z")); // End of DST 2024 (UTC + 12)
-            Assert.Equal("2024-09-29T13:23:08.111", NzTimeConverter.Convert("2024-09-29T00:23:08.111Z")); // First day of DST 2024 (UTC + 13)
-            Assert.Equal("2025-04-05T13:00:00.000", NzTimeConverter.Convert("2025-04-05T00:00:00.000Z")); // Last day of DST 2025 (UTC + 13)
-            Assert.Equal("2025-04-06T12:00:00.000", NzTimeConverter.Convert("2025-04-06T00:00:00.000Z")); // End of DST 2025 (UTC + 12)
+            Assert.Equal(expected, NzTimeConverter.Convert(input));
         }
 
-        [Fact]
-        public void Convert_UtcTimeOffset_ReturnsConvertedValue()
+        [Theory]
+        [InlineData("2008-07-15T08:00:00.000", "2008-07-15T07:00:00.000+11:00")] // UTC+11 -> UTC+12
+        [InlineData("2008-07-15T14:00:00.000", "2008-07-15T07:00:00.000+05:00")] // UTC+5 -> UTC+12
+        [InlineData("2008-07-16T07:00:00.000", "2008-07-15T07:00:00.000-12:00")] // Negative offset with date rollover
+        [InlineData("2008-07-15T15:56:23.632", "2008-07-15T03:56:23.632+00:00")] // Zero offset (positive)
+        [InlineData("2008-07-15T15:56:23.632", "2008-07-15T03:56:23.632-00:00")] // Zero offset (negative)
+        [InlineData("2008-07-15T07:00:00.000", "2008-07-15T07:00:00.000+12:00")] // UTC+12 -> UTC+12
+        [InlineData("2024-04-06T01:00:00.000", "2024-04-06T00:00:00.000+12:00")] // UTC+12 -> UTC+13 (DST)
+        [InlineData("2015-06-22T18:10:33.142", "2015-06-22T14:10:33.142+08:00")] // UTC+8 -> UTC+12 (Not DST)
+        [InlineData("2015-06-22T18:10:33.142", "2015-06-22T05:10:33.142-01:00")] // UTC-11 -> UTC+12 (Not DST)
+        public void Convert_UtcTimeOffset_ReturnsConvertedValue(string expected, string input)
         {
-            Assert.Equal("2008-07-15T08:00:00.000", NzTimeConverter.Convert("2008-07-15T07:00:00.000+11:00")); // UTC+11 -> UTC+12
-            Assert.Equal("2008-07-15T14:00:00.000", NzTimeConverter.Convert("2008-07-15T07:00:00.000+05:00")); // UTC+5 -> UTC+12
-            Assert.Equal("2008-07-16T07:00:00.000", NzTimeConverter.Convert("2008-07-15T07:00:00.000-12:00")); // Negative offset with date rollover
-            Assert.Equal("2008-07-15T15:56:23.632", NzTimeConverter.Convert("2008-07-15T03:56:23.632+00:00")); // Zero offset (positive)
-            Assert.Equal("2008-07-15T15:56:23.632", NzTimeConverter.Convert("2008-07-15T03:56:23.632-00:00")); // Zero offset (negative)
-            Assert.Equal("2008-07-15T07:00:00.000", NzTimeConverter.Convert("2008-07-15T07:00:00.000+12:00")); // UTC+12 -> UTC+12
-            Assert.Equal("2024-04-06T01:00:00.000", NzTimeConverter.Convert("2024-04-06T00:00:00.000+12:00")); // UTC+12 -> UTC+13 (DST)
-            Assert.Equal("2015-06-22T18:10:33.142", NzTimeConverter.Convert("2015-06-22T14:10:33.142+08:00")); // UTC+8 -> UTC+12 (Not DST)
-            Assert.Equal("2015-06-22T18:10:33.142", NzTimeConverter.Convert("2015-06-22T05:10:33.142-01:00")); // UTC-11 -> UTC+12 (Not DST)
+            Assert.Equal(expected, NzTimeConverter.Convert(input));
         }
     }
 }
