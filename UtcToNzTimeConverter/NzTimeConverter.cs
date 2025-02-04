@@ -9,18 +9,15 @@ public class NzTimeConverter
 
     public static string Convert(string timestamp)
     {
-        string format = _standardFormat;
+        bool mayHaveSpecifier = (timestamp.Length > _standardFormat.Length);
 
-        bool mayHaveSpecifier = false;
-        if (timestamp.Length > _standardFormat.Length)
-        {
-            mayHaveSpecifier = true;
-            format += "K"; // 'K' denotes both Zulu time and UTC offsets in the format patterb
-        }
-
+        // when "K" is added to the format validation string, the parser will accept
+        // timestamps with a Z or UTC (e.g. +05:00) indicator, and will still accept timestamps 
+        // without a timezone specifier
+        string validationFormat = _standardFormat + "K";
         bool validTimeStamp = DateTime.TryParseExact(
                 timestamp,
-                format,
+                validationFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.AdjustToUniversal,
                 out DateTime dt
@@ -33,6 +30,7 @@ public class NzTimeConverter
         }
         if (validTimeStamp)
         {
+            // If no specified offset then as no conversion is necessary
             return timestamp;
         }
         else
